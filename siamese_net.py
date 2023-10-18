@@ -68,15 +68,13 @@ def load_and_preprocess(csv_file, root_url='http://ecx.images-amazon.com/images/
     to VGG16 and pushing them through VGG16.
     '''
     data = pd.read_csv(csv_file, sep=';')
-    k = 1
-    
-    for i in ['pic1', 'pic2']:
-        print("Preprocessing part {} of 2.".format(k))
+    for k, i in enumerate(['pic1', 'pic2'], start=1):
+        print(f"Preprocessing part {k} of 2.")
         widgets = ['Progress: ', pb.Percentage(), ' ', pb.Bar(marker='0',left='[',right=']'),
                    ' ', pb.ETA(), ' ', pb.FileTransferSpeed(), ' ']
         pbar = pb.ProgressBar(widgets=widgets, maxval=len(data))
         pbar.start()
-                
+
         for j in range(len(data)):
             url = root_url + data[i][j]
             file = cStringIO.StringIO(urllib.urlopen(url).read())
@@ -91,8 +89,6 @@ def load_and_preprocess(csv_file, root_url='http://ecx.images-amazon.com/images/
         time.sleep(1)
         print("Done.")
         time.sleep(1)
-        k += 1
-    
     print("All data preprocessed.")
     return data
 
@@ -146,8 +142,7 @@ def siam_cnn():
     processed_a = base_network(input_a)
     processed_b = base_network(input_b)
     distance = Lambda(euclidean_distance, output_shape=eucl_dist_output_shape)([processed_a, processed_b])
-    model = Model(input=[input_a, input_b], output=distance)
-    return model
+    return Model(input=[input_a, input_b], output=distance)
     
 
 def train_and_predict(csv_file, build_new=True):

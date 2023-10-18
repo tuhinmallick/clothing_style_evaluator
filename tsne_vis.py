@@ -20,7 +20,7 @@ def prepare_model_and_data(csv_file):
     '''
     trained_model = load_model('models/best_model.h5', 
                                custom_objects={'contrastive_loss': contrastive_loss})
-    
+
     top_model = create_base_network()
     weights_layer = np.asarray([trained_model.layers[2].get_weights()[0], trained_model.layers[2].get_weights()[1]])
     top_model.layers[0].set_weights(weights_layer)
@@ -29,8 +29,7 @@ def prepare_model_and_data(csv_file):
     max_value = np.load('data/max_value.npy')
     pairdata /= max_value
     imgstream = pairdata[:,0]
-    pred = top_model.predict(imgstream)
-    return pred
+    return top_model.predict(imgstream)
 
 
 def prepare_images(csv_file):
@@ -53,8 +52,7 @@ def tsne(csv_file):
     '''
     pred = prepare_model_and_data(csv_file)
     tsne = TSNE()
-    tsne_transformed = tsne.fit_transform(pred)
-    return tsne_transformed
+    return tsne.fit_transform(pred)
 
     
 def min_resize(img, size):
@@ -75,8 +73,8 @@ def image_scatter(csv_file, img_res=150, res=8000):
     '''
     images = prepare_images(csv_file)
     images = [min_resize(image, img_res) for image in images]
-    max_width = max([image.shape[0] for image in images])
-    max_height = max([image.shape[1] for image in images])
+    max_width = max(image.shape[0] for image in images)
+    max_height = max(image.shape[1] for image in images)
 
     f2d = tsne(csv_file)
 
@@ -102,7 +100,7 @@ def image_scatter(csv_file, img_res=150, res=8000):
         x_idx = np.argmin((x - x_coords)**2)
         y_idx = np.argmin((y - y_coords)**2)
         canvas[x_idx:x_idx+w, y_idx:y_idx+h] = image
-   
+
     plt.figure(figsize=(60,60))
     plt.imshow(canvas)
     #plt.savefig('tsne.png')
